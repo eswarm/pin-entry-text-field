@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class PinEntryTextField extends StatefulWidget {
-  final String lastPin;
+  String lastPin;
   final int fields;
   final ValueChanged<String> onSubmit;
   final num fieldWidth;
@@ -12,14 +12,13 @@ class PinEntryTextField extends StatefulWidget {
   final bool isTextObscure;
   final bool showFieldAsBox;
 
-  PinEntryTextField(
-      {this.lastPin,
-      this.fields: 4,
-      this.onSubmit,
-      this.fieldWidth: 40.0,
-      this.fontSize: 20.0,
-      this.isTextObscure: false,
-      this.showFieldAsBox: false})
+  PinEntryTextField({this.lastPin,
+    this.fields: 4,
+    this.onSubmit,
+    this.fieldWidth: 40.0,
+    this.fontSize: 20.0,
+    this.isTextObscure: false,
+    this.showFieldAsBox: false})
       : assert(fields > 0);
 
   @override
@@ -76,8 +75,8 @@ class PinEntryTextFieldState extends State<PinEntryTextField> {
 
   void clearTextFields() {
     _textControllers.forEach(
-        (TextEditingController tEditController) => tEditController.clear());
-    _pin.clear();
+            (TextEditingController tEditController) => tEditController.clear());
+    _pin = List<String>(widget.fields);
   }
 
   Widget buildTextField(int i, BuildContext context, [bool autofocus = false]) {
@@ -87,7 +86,9 @@ class PinEntryTextFieldState extends State<PinEntryTextField> {
     if (_textControllers[i] == null) {
       _textControllers[i] = TextEditingController();
       if (widget.lastPin != null) {
-        _textControllers[i].text = widget.lastPin[i];
+        if(widget.lastPin.length > i) {
+          _textControllers[i].text = widget.lastPin[i];
+        }
       }
     }
 
@@ -119,6 +120,7 @@ class PinEntryTextFieldState extends State<PinEntryTextField> {
                 : null),
         onChanged: (String str) {
           setState(() {
+            widget.lastPin = _pin[i];
             _pin[i] = str;
           });
           if (i + 1 != widget.fields) {
@@ -149,6 +151,9 @@ class PinEntryTextFieldState extends State<PinEntryTextField> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.lastPin != null && widget.lastPin.length == 0) {
+      clearTextFields();
+    }
     return textfields;
   }
 }
